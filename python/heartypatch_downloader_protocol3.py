@@ -77,7 +77,6 @@ class HeartyPatch_TCP_Parser:
         self.all_rtor = []
         self.all_hr = []
         self.all_ecg = []
-        pass
     
     def add_data(self, new_data):
         self.data += new_data
@@ -234,24 +233,19 @@ def finish(show_plot):
     duration = time.time() - tStart
     if soc is not None:
         soc.close()
-    
+
     packet_rate = float(hp.packet_count)/duration
     ecg_sample_rate = float(len(hp.all_ecg)) / duration
     print
-    print 'Recording duration: {:0.1f} sec  -- Packet Rate: {:0.1f} pkt/sec  ECG Sample Rate: {:0.1f} samp/sec'.format(
-        duration, packet_rate, ecg_sample_rate)
+    global soc
+    global soc
+    print
     print 'Packets: {}  Bytes_per_packet: {}  Bad Packets: {}  Bytes Skipped: {}'.format(
         hp.packet_count, hp.total_bytes/float(hp.packet_count), hp.bad_packet_count, hp.bytes_skipped)
     print
     if len(hp.all_ecg) > 0:
-        print 'Signal -- Max: {:0.0f}  Min: {:0.0f}  Range: {:0.0f}'.format(
-            np.max(hp.all_ecg), np.min(hp.all_ecg), np.max(hp.all_ecg)- np.min(hp.all_ecg))
-        print 'Index of largest and smallest values -- max: {} min:{}'.format(
-            np.argmax(hp.all_ecg), np.argmin(hp.all_ecg))
-
-
     ptr = fname.rfind('.')
-    fname_ecg =  fname[:ptr] + '_ecg' + fname[ptr:]
+    fname_ecg = f'{fname[:ptr]}_ecg{fname[ptr:]}'
 
     header = '{} Epoch: {}  Duration: {:0.1f} sec  Rate: {:0.1f}'.format(
         time.ctime(tStart), tStart, duration, ecg_sample_rate)
@@ -263,11 +257,7 @@ def finish(show_plot):
 
     for i in range(1, len(hp.all_seq)):
         if hp.all_seq[i] != hp.all_seq[i-1] + 1:
-            print 'gap at:', i, hp.all_ts[i-1], hp.all_ts[i]
-
-    print 'Timestamps -- duration: {}  start: {}  end: {}'.format(
-        hp.all_ts[-1]- hp.all_ts[0], hp.all_ts[0], hp.all_ts[-1])
-
+    global soc
     if show_plot:
         n = int(5*ecg_sample_rate)
         plt.figure(figsize=(11, 2))
